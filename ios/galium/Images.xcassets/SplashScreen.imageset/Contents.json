@@ -1,0 +1,23 @@
+{
+  "images" : [
+    {
+      "filename" : "Huong dan trinh bay khoa luan TN, do an TN.jpeg",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "filename" : "Huong dan trinh bay khoa luan TN, do an TN 1.jpeg",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "Huong dan trinh bay khoa luan TN, do an TN 2.jpeg",
+      "idiom" : "universal",
+      "scale" : "3x"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
