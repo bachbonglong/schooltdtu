@@ -13,39 +13,36 @@ import {
 import { Block, Button, Input, NavBar, Toast } from "galio-framework";
 import theme from "../theme";
 import { ScaleSize, getStorage, setStorage } from "../Utils.js";
-import { CallAPIAuthentication } from "../Utils/requestAPI";
+import { CallAPIAuthentication, CallNewAPI } from "../Utils/requestAPI";
 import { Popup, Root } from "popup-ui";
-import Spinner from "react-native-loading-spinner-overlay";
 
 const { width } = Dimensions.get("window");
 
-class Login extends React.Component {
-  state = {
-    username: "",
-    password: "123456",
-    spinner: false,
-  };
+class ChangePass extends React.Component {
+  constructor(props) {
+    super();
+    this.state = {
+      access_token: props?.route?.params?.access_token,
+      password: props?.route?.params?.password,
+      new_password: "",
+      username: props?.route?.params?.username,
+    };
+  }
 
-  handleChange = (name, value) => {
-    this.setState({ [name]: value });
-  };
-
-  async componentDidMount() {
-    const _username = await getStorage("username", "");
-    this.setState({ username: _username });
+  componentDidMount() {
+    this.setState({ password: this.props?.route?.params?.password });
   }
 
   handleLogin = () => {
     const { navigation } = this.props;
-    const { username, password } = this.state;
-
+    const { new_password, password, access_token, username } = this.state;
     Keyboard.dismiss();
-    if (!username) {
+    if (!new_password) {
       Popup.show({
         type: "Warning",
         title: "Warning",
         button: true,
-        textBody: "User name empty",
+        textBody: "Old Password is not empty",
         buttonText: "Ok",
       });
     } else if (!password) {
@@ -53,48 +50,41 @@ class Login extends React.Component {
         type: "Warning",
         title: "Warning",
         button: true,
-        textBody: "Password empty",
+        textBody: "New Password is not empty",
         buttonText: "Ok",
       });
     } else {
-      this.setState({ spinner: true });
-      CallAPIAuthentication({ username, password }, (res) => {
-        this.setState({ spinner: false });
-
-        if (res.message === "Login successful") {
-          setStorage("username", username);
-          setStorage("password", password);
-          navigation.navigate("App");
-          setStorage("access_token", res?.access_token);
-        } else if (res?.message == "Please change your password") {
-          setStorage("username", username);
-          navigation.navigate("CHANGE PASS", {
-            access_token: res?.access_token,
-            password: password,
-            username: username,
-          });
-        } else {
-          Popup.show({
-            type: "Danger",
-            title: "Warning",
-            button: true,
-            textBody: res?.message || "Check username or password",
-            buttonText: "Ok",
-          });
+      CallNewAPI(
+        access_token,
+        `users/accounts/change-password/${username}/`,
+        { old_password: password, new_password: new_password },
+        "PUT",
+        (res) => {
+          if (res.message !== "Password changed successfully.") {
+            Popup.show({
+              type: "Danger",
+              title: "Warning",
+              button: true,
+              textBody: res?.message || "Check Old Password or password",
+              buttonText: "Ok",
+            });
+          } else {
+            setStorage("access_token", res?.access_token);
+            navigation.navigate("App");
+          }
         }
-      });
+      );
     }
   };
 
+  handleChange = (name, value) => {
+    this.setState({ [name]: value });
+  };
+
   render() {
-    const { username } = this.state;
+    const { new_password, password } = this.state;
     return (
       <Block safe flex style={{ backgroundColor: theme.COLORS.WHITE }}>
-        <Spinner
-          visible={this.state.spinner}
-          size={"large"}
-          textStyle={styles.spinnerTextStyle}
-        />
         <NavBar
           style={
             Platform.OS === "android" ? { marginTop: theme.SIZES.BASE } : null
@@ -117,39 +107,29 @@ class Login extends React.Component {
               space="between"
               style={{ marginVertical: ScaleSize(30) }}
             >
-              <Text style={{ fontSize: ScaleSize(30) }}>{"Sign up"}</Text>
+              <Text style={{ fontSize: ScaleSize(30) }}>{"Change Pass"}</Text>
             </Block>
           </Block>
           <Block style={{}}>
             <Input
-              value={username}
+              value={password}
               rounded
               color={theme.COLORS.BLACK}
-              placeholder="User Name"
+              placeholder="Old Pass"
               autoCapitalize="none"
               style={{ width: width * 0.9, color: theme.COLORS.BLACK }}
               onChangeText={(text) => this.handleChange("username", text)}
             />
             <Input
+              value={new_password}
               rounded
               color={theme.COLORS.BLACK}
               password
               viewPass
-              placeholder="Password"
+              placeholder="New Password"
               style={{ width: width * 0.9, color: theme.COLORS.BLACK }}
-              onChangeText={(text) => this.handleChange("password", text)}
+              onChangeText={(text) => this.handleChange("new_password", text)}
             />
-            <Text
-              color={theme.COLORS.ERROR}
-              size={theme.SIZES.FONT * 0.75}
-              onPress={() => Alert.alert("Not implemented")}
-              style={{
-                alignSelf: "flex-end",
-                lineHeight: theme.SIZES.FONT * 2,
-              }}
-            >
-              Forgot your password?
-            </Text>
           </Block>
           <Block flex style={{ marginTop: ScaleSize(50) }}>
             <Button round color="error" onPress={this.handleLogin}>
@@ -165,9 +145,7 @@ class Login extends React.Component {
                 color={theme.COLORS.ERROR}
                 size={theme.SIZES.FONT * 0.75}
               >
-                {
-                  "If you do not have an account, please contact the relevant department for support"
-                }
+                {"Update Pass when first time login"}
               </Text>
             </Button>
           </Block>
@@ -192,9 +170,6 @@ const styles = StyleSheet.create({
     borderRadius: theme.SIZES.BASE * 1.75,
     justifyContent: "center",
   },
-  spinnerTextStyle: {
-    color: "#FFF",
-  },
 });
 
-export default Login;
+export default ChangePass;

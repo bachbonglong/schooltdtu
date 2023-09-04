@@ -8,6 +8,9 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { ScaleSize } from "../Utils";
+import { Table } from "react-native-table-component";
+import { Row } from "react-native-table-component";
+import { Rows } from "react-native-table-component";
 
 const data = [
   {
@@ -22,12 +25,23 @@ const data = [
     subject: "Hóa",
     scores: { score1: "9 ", score2: "9", score3: 8 },
   },
-  // Add more subjects here
+];
+
+const tableHead = ["Subject", "Hệ số 1", "Hệ số 2", "hệ số 3"];
+const tableData = [
+  ["Toán", "2", "3", "4"],
+  ["Lý", "3", "4", "5"],
+  ["Hóa", "2", "3", "2"],
+  ["Văn", "5", "4", "3"],
+  ["Sử", "2", "3", "4"],
+  ["Địa", "6", "5", "3"],
+  ["Tiếng anh", "9", "4", "5"],
 ];
 
 const App = () => {
   const [selectedSemester, setSelectedSemester] = useState("Học kì 1");
   const [selectedYear, setSelectedYear] = useState("2023");
+
   const studentName = "Nguyễn Văn A"; // Tên học sinh
   const teacherName = "Nguyễn Thị B"; // Tên giáo viên chủ nhiệm
   const renderHeader = () => (
@@ -95,13 +109,10 @@ const App = () => {
           Giáo viên chủ nhiệm: {teacherName}
         </Text>
       </View>
-      {renderHeader()}
-      <FlatList
-        data={data}
-        style={{ bottom: 100 }}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => index.toString()}
-      />
+      <Table borderStyle={{ borderWidth: 2, borderColor: "#c8e1ff" }}>
+        <Row data={tableHead} style={styles.head} textStyle={styles.text} />
+        <Rows data={tableData} textStyle={styles.text} />
+      </Table>
     </View>
   );
 };
@@ -119,8 +130,8 @@ const styles = StyleSheet.create({
     bottom: 200,
   },
   option: {
-    flex: 1,
     marginRight: 8,
+    marginBottom: ScaleSize(50),
   },
   optionText: {
     fontSize: 16,
@@ -161,6 +172,10 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 8,
   },
+
+  container: { flex: 1, padding: 16, paddingTop: 30, backgroundColor: "#fff" },
+  head: { height: 40, backgroundColor: "#f1f8ff" },
+  text: { margin: 6 },
 });
 
 export default App;

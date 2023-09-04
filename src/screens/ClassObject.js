@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,9 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
+import { CallNewAPI } from "../Utils/requestAPI";
+import { ScaleSize, getStorage } from "../Utils";
+import moment from "moment";
 
 const subjectsData = [
   {
@@ -33,49 +36,80 @@ const subjectsData = [
   // Add more subjects here
 ];
 
-const randomColor = () => {
-  const colors = ["#FF5733", "#C70039", "#900C3F", "#581845", "#003366"];
-  const randomIndex = Math.floor(Math.random() * colors.length);
-  return colors[randomIndex];
-};
-
-const SubjectItem = ({ name, teacher, teacherImage, props }) => (
-  <TouchableOpacity
-    style={[styles.subjectItem, { backgroundColor: randomColor() }]}
-    activeOpacity={0.8}
-    onPress={() => {
-      const { navigation } = props;
-      navigation.navigate("DETAIL CLASS SUBJECT");
-    }}
-  >
-    <Image source={{ uri: teacherImage }} style={styles.teacherImage} />
-    <View style={styles.subjectInfo}>
-      <Text style={styles.subjectName}>{"Tên môn học: " + name}</Text>
-      <Text style={styles.teacherName}>{"Giáo viên: " + teacher}</Text>
-    </View>
-    <Image
-      source={{
-        uri: "https://w7.pngwing.com/pngs/955/437/png-transparent-arrow-chevron-right-small-direction-navigation-arrow-icon.png",
-      }} // Thay đổi đường dẫn ảnh của mũi tên bên phải
-      style={styles.arrowIcon}
-    />
-  </TouchableOpacity>
-);
-
 const ClassObject = (props) => {
+  const [classData, setClassData] = useState([]);
+
+  useEffect(() => {
+    setTimeout(async () => {
+      const access_token = await getStorage("access_token", "");
+
+      CallNewAPI(access_token, `users/list-classrooms/`, "", "GET", (res) => {
+        // if (res) setUserInfo(res);
+        setClassData(res);
+      });
+    }, 100);
+  }, []);
+
+  const randomColor = () => {
+    const colors = [
+      "#FF5733",
+      "#C70039",
+      "#900C3F",
+      "#581845",
+      "#003366",
+      "#FF7F50",
+      "#B22222",
+      "#FF69B4",
+      "#808080",
+      "#800080",
+    ];
+    const randomIndex = Math.floor(Math.random() * colors.length);
+    return colors[randomIndex];
+  };
+
+  const SubjectItem = ({ item, props }) => (
+    <TouchableOpacity
+      style={[styles.subjectItem, { backgroundColor: randomColor() }]}
+      activeOpacity={0.8}
+      onPress={() => {
+        const { navigation } = props;
+        navigation.navigate("DETAIL CLASS SUBJECT", { item: item });
+      }}
+    >
+      {/* <Image source={{ uri: teacherImage }} style={styles.teacherImage} /> */}
+      <View style={styles.subjectInfo}>
+        <Text style={styles.subjectName}>
+          {"Info Class: " + item?.class_id}
+        </Text>
+        <Text style={styles.subjectName}>
+          {"Create Date Class: " +
+            moment(item?.created_date).format("DD-MM-YYYY")}
+        </Text>
+
+        <Text style={{}}>{"Info Class" + item?.info}</Text>
+        {/* <Text style={styles.teacherName}>{"Giáo viên: " + teacher}</Text> */}
+        <Text style={styles.subjectName}>
+          {"School Year: " + item?.school_year}
+        </Text>
+        <Text style={styles.subjectName}>{"Semester: " + item?.semester}</Text>
+      </View>
+      <Image
+        source={{
+          uri: "https://w7.pngwing.com/pngs/955/437/png-transparent-arrow-chevron-right-small-direction-navigation-arrow-icon.png",
+        }} // Thay đổi đường dẫn ảnh của mũi tên bên phải
+        style={styles.arrowIcon}
+      />
+    </TouchableOpacity>
+  );
+
   const renderSubjectItem = ({ item }) => (
-    <SubjectItem
-      name={item.name}
-      teacher={item.teacher}
-      teacherImage={item.teacherImage}
-      props={props}
-    />
+    <SubjectItem item={item} props={props} />
   );
 
   return (
     <View style={styles.container}>
       <FlatList
-        data={subjectsData}
+        data={classData}
         renderItem={renderSubjectItem}
         keyExtractor={(item) => item.id}
         numColumns={1}
@@ -119,6 +153,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "white",
+    paddingVertical: ScaleSize(10),
   },
   teacherName: {
     fontSize: 14,

@@ -23,7 +23,6 @@ export async function getStorage(keys, defaultValue = null) {
     let tempValue = temp;
     return tempValue;
   } catch (error) {
-    console.debug(error);
     return temp;
   }
 }

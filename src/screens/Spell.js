@@ -2,42 +2,36 @@ import React, { Component } from "react";
 import { ScrollView, View, StyleSheet } from "react-native";
 import { Card, Text } from "react-native-elements";
 import * as Animatable from "react-native-animatable";
+import { TouchableOpacity } from "react-native";
 
 const feedbackData = [
   {
-    teacher: "Teacher 1",
-    content: "Good job in the last class. Keep it up!",
+    teacher: "Tư vấn chọn khối",
+    content:
+      "Dựa vào số điểm của bạn cung cấp, và những điểm mạnh của bạn chúng tôi sẽ đưa ra lời khuyên lựa chọn khối phù hợp cho bạn",
     feedbackType: "positive",
+    screen: "Prediction Industry Sector",
   },
   {
-    teacher: "Teacher 2",
-    content: "You need to improve your participation.",
+    teacher: "Lấy điểm chuẩn thông tin Trường",
+    content:
+      "Dựa vào mã trường chúng tôi sẽ cung cấp điểm chuẩn từng ngành môn học và cách thức xét tuyển của trường đó.",
     feedbackType: "negative",
+    screen: "Get Info University",
   },
+
   {
-    teacher: "Teacher 3",
-    content: "Excellent work. You're a dedicated student.",
-    feedbackType: "positive",
+    teacher: "Tính nhanh điểm xét tốt nghiệp",
+    content:
+      "Dựa vào bảng điểm bảng cung cấp tôi sẽ tính nhanh điểm tốt nghiệp một cách chính xác nhất",
+    feedbackType: "negative",
+    screen: "Quick Calculator",
   },
-  {
-    teacher: "Teacher 4",
-    content: "Excellent work. You're a dedicated student.",
-    feedbackType: "positive",
-  },
-  {
-    teacher: "Teacher 5",
-    content: "Excellent work. You're a dedicated student.",
-    feedbackType: "positive",
-  },
-  {
-    teacher: "Teacher 6",
-    content: "Excellent work. You're a dedicated student.",
-    feedbackType: "positive",
-  },
+
   // Add more feedback items with feedbackType as "positive" or "negative"
 ];
 
-export default class FeedbackScreen extends Component {
+export default class SpellScreen extends Component {
   renderFeedbackCards() {
     return feedbackData.map((item, index) => (
       <Animatable.View
@@ -46,21 +40,20 @@ export default class FeedbackScreen extends Component {
         duration={1000} // Animation duration in milliseconds
         style={styles.feedbackContainer}
       >
-        <Card
-          containerStyle={[
-            styles.cardContainer,
-            item.feedbackType === "positive"
-              ? styles.positiveCard
-              : styles.negativeCard,
-          ]}
+        <TouchableOpacity
+          onPress={() => {
+            this.props?.navigation.navigate(item?.screen);
+          }}
         >
-          <View style={styles.teacherInfo}>
-            <Text h4 style={styles.teacherText}>
-              {item.teacher}
-            </Text>
-          </View>
-          <Text style={styles.feedbackText}>{item.content}</Text>
-        </Card>
+          <Card containerStyle={[styles.cardContainer, styles.positiveCard]}>
+            <View style={styles.teacherInfo}>
+              <Text h4 style={styles.teacherText}>
+                {item.teacher}
+              </Text>
+            </View>
+            <Text style={styles.feedbackText}>{item.content}</Text>
+          </Card>
+        </TouchableOpacity>
       </Animatable.View>
     ));
   }
@@ -80,9 +73,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 10,
   },
-  feedbackContainer: {
-    margin: 10,
-  },
+  feedbackContainer: {},
   cardContainer: {
     padding: 15,
     borderRadius: 10,
@@ -116,8 +107,8 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   feedbackCountCard: {
-    width: 50,
-    height: 50,
+    width: 100,
+    height: 100,
     borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",

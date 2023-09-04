@@ -33,6 +33,12 @@ import DetailClassObject from "../screens/DetailClassObject";
 import ChatScreen from "../screens/ChatGPT";
 import NotificationsScreen from "../screens/Notification";
 import TeacherFeedbackScreen from "../screens/Feedback";
+import ChangePass from "../screens/ChangePass";
+import DetailComment from "../screens/DetailComment";
+import SpellScreen from "../screens/Spell";
+import DuDoanChonKhoi from "../screens/DuDoanChonKhoi";
+import QuickCaculator from "../screens/QuickCaculator";
+import GetInfo from "../screens/GetInfo";
 
 const { width } = Dimensions.get("screen");
 
@@ -342,6 +348,12 @@ function HomeStack(props) {
         component={DetailClassObject}
         options={{}}
       />
+
+      <Stack.Screen
+        name="DETAIL COMMENT"
+        component={DetailComment}
+        options={{}}
+      />
       <Stack.Screen name="CHAT GPT" component={ChatScreen} options={{}} />
 
       <Stack.Screen
@@ -353,6 +365,23 @@ function HomeStack(props) {
       <Stack.Screen
         name="Feedback"
         component={TeacherFeedbackScreen}
+        options={{}}
+      />
+
+      <Stack.Screen name="Prediction" component={SpellScreen} options={{}} />
+      <Stack.Screen
+        name="Prediction Industry Sector"
+        component={DuDoanChonKhoi}
+        options={{}}
+      />
+      <Stack.Screen
+        name="Quick Calculator"
+        component={QuickCaculator}
+        options={{}}
+      />
+      <Stack.Screen
+        name="Get Info University"
+        component={GetInfo}
         options={{}}
       />
     </Stack.Navigator>
@@ -376,6 +405,7 @@ export default function OnboardingStack(props) {
           headerTransparent: true,
         }}
       />
+      <Stack.Screen name="CHANGE PASS" component={ChangePass} />
       <Stack.Screen name="App" component={AppStack} />
       <Stack.Screen name="Pro" component={Pro} />
     </Stack.Navigator>

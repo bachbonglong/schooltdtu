@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,73 +8,133 @@ import {
   ScrollView,
   StyleSheet,
   KeyboardAvoidingView,
+  ActivityIndicator,
 } from "react-native";
+import { Keyboard } from "react-native";
 
 const ChatScreen = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const flatListRef = useRef(null);
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      flatListRef.current.scrollToEnd({ animated: true });
+    }
+  }, [messages, Keyboard]);
+
+  useEffect(() => {
+    sendMessageFirstTime();
+  }, []);
 
   const sendMessage = async () => {
+    flatListRef.current.scrollToEnd({ animated: true });
     if (newMessage.trim() === "") return;
 
-    setMessages([...messages, { text: newMessage, isUser: true }]);
+    // Lưu trữ tin nhắn của người dùng tạm thời
+    const userMessage = { text: newMessage, isUser: true };
+
+    // Thêm tin nhắn của người dùng vào danh sách tin nhắn
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+
     setNewMessage("");
+    setIsLoading(true);
 
     try {
       const response = await generateResponseFromGPT(newMessage);
-      setMessages([...messages, { text: response, isUser: false }]);
+      // Thêm tin nhắn của AI vào danh sách tin nhắn sau khi nhận phản hồi từ API
+      const aiMessage = { text: response, isUser: false };
+      setMessages((prevMessages) => [...prevMessages, aiMessage]);
     } catch (error) {
       console.error("Error generating GPT response:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const sendMessageFirstTime = async () => {
+    flatListRef.current.scrollToEnd({ animated: true });
+
+    // Lưu trữ tin nhắn của người dùng tạm thời
+    const userMessage = { text: newMessage, isUser: true };
+
+    // Thêm tin nhắn của người dùng vào danh sách tin nhắn
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+
+    setNewMessage("");
+    setIsLoading(true);
+
+    try {
+      const response = await generateResponseFromGPT("Xin chào");
+      // Thêm tin nhắn của AI vào danh sách tin nhắn sau khi nhận phản hồi từ API
+      const aiMessage = { text: response, isUser: false };
+      setMessages((prevMessages) => [...prevMessages, aiMessage]);
+    } catch (error) {
+      console.error("Error generating GPT response:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const generateResponseFromGPT = async (userMessage) => {
-    const apiKey = "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";
-    const prompt = `User: ${userMessage}\nGPT: `;
-    const response = await fetch(
-      "https://api.openai.com/v1/engines/davinci-codex/completions",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          prompt: prompt,
-          max_tokens: 50,
-        }),
-      }
-    );
+    const apiKey = "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";
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        messages: [{ role: "system", content: userMessage }],
+        model: "gpt-3.5-turbo",
+      }),
+    });
     const responseBody = await response.json();
-    return "GPT Maintenance";
+    console.debug("=-=responseBody", responseBody);
+    return responseBody.choices[0].message.content;
   };
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : null}
       keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
-      style={{ flex: 1, lexDirection: "column" }}
+      style={{ flex: 1 }}
     >
       <View style={styles.container}>
         <FlatList
+          ref={flatListRef}
           data={messages}
           renderItem={({ item }) => (
             <View style={item.isUser ? styles.userMessage : styles.botMessage}>
-              <Text>{item.text}</Text>
+              <Text style={item.isUser ? { color: "white" } : {}}>
+                {item.text}
+              </Text>
             </View>
           )}
           keyExtractor={(item, index) => index.toString()}
-          contentContainerStyle={styles.messagesContainer}
-          inverted
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          inverted={false}
+          contentContainerStyle={styles.messagesContainer} // Thêm style này
         />
+        {isLoading && (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="small" color="#007BFF" />
+            <Text style={styles.loadingText}>Typing...</Text>
+          </View>
+        )}
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
             value={newMessage}
+            editable={!isLoading}
             onChangeText={(text) => setNewMessage(text)}
             placeholder="Type a message..."
+            onSubmitEditing={sendMessage}
           />
-          <Button title="Send" onPress={sendMessage} />
+          <Button title="Send" onPress={sendMessage} disabled={isLoading} />
         </View>
       </View>
     </KeyboardAvoidingView>
@@ -121,6 +181,16 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     color: "#333",
     fontSize: 14,
+  },
+  loadingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    marginVertical: 4,
+  },
+  loadingText: {
+    marginLeft: 8,
+    color: "#777",
   },
 });
 

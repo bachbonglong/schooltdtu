@@ -1,7 +1,14 @@
 import React from "react";
 import { View, Text, StyleSheet, Image } from "react-native";
+import { CallNewAPI } from "../Utils/requestAPI";
+import { getStorage } from "../Utils";
 
 const Profile = () => {
+  useEffect(() => {
+    const access_token = getStorage("access_token", "");
+    CallNewAPI();
+  }, []);
+
   return (
     <View style={styles.container}>
       <Image

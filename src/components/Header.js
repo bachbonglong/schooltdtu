@@ -21,7 +21,7 @@ const iPhoneX = () =>
 const BellButton = ({ isWhite, style, navigation, username = "" }) => (
   <TouchableOpacity
     style={[styles.button, style]}
-    onPress={() => navigation.navigate("Pro")}
+    onPress={() => navigation.navigate("PROFILE")}
   >
     <Text style={{ color: "white" }}>{"Xin chào " + username}</Text>
   </TouchableOpacity>
@@ -359,6 +359,7 @@ const styles = StyleSheet.create({
   button: {
     position: "relative",
     width: 200,
+    right: 20,
   },
   title: {
     width: "100%",

@@ -47,7 +47,7 @@ class Onboarding extends React.Component {
               <Button
                 style={styles.button}
                 color={theme.COLORS.SECONDARY}
-                onPress={() => navigation.navigate("LOGIN")}
+                onPress={() => navigation.navigate("App")}
                 textStyle={{ color: theme.COLORS.BLACK }}
               >
                 Start App
