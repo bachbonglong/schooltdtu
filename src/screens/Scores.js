@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,10 +7,11 @@ import {
   Picker,
   TouchableOpacity,
 } from "react-native";
-import { ScaleSize } from "../Utils";
+import { ScaleSize, getStorage } from "../Utils";
 import { Table } from "react-native-table-component";
 import { Row } from "react-native-table-component";
 import { Rows } from "react-native-table-component";
+import { CallAPIAuthentication, CallNewAPI } from "../Utils/requestAPI";
 
 const data = [
   {
@@ -27,7 +28,12 @@ const data = [
   },
 ];
 
-const tableHead = ["Subject", "Hệ số 1", "Hệ số 2", "hệ số 3"];
+const tableHead = [
+  "Subject",
+  "score_system_1",
+  "score_system_2",
+  "score_system_3",
+];
 const tableData = [
   ["Toán", "2", "3", "4"],
   ["Lý", "3", "4", "5"],
@@ -38,12 +44,38 @@ const tableData = [
   ["Tiếng anh", "9", "4", "5"],
 ];
 
-const App = () => {
+const App = (props) => {
   const [selectedSemester, setSelectedSemester] = useState("Học kì 1");
   const [selectedYear, setSelectedYear] = useState("2023");
 
-  const studentName = "Nguyễn Văn A"; // Tên học sinh
-  const teacherName = "Nguyễn Thị B"; // Tên giáo viên chủ nhiệm
+  const [studentName, setStudent] = useState("");
+  const [score, setScore] = useState([]);
+
+  useEffect(() => {
+    setTimeout(async () => {
+      const username = await getStorage("username", "");
+      const access_token = await getStorage("access_token", "");
+      setStudent(username);
+      CallNewAPI(
+        access_token,
+        `classroom/student/${username}/scores/2023/1`,
+        "",
+        "GET",
+        (res) => {
+          console.debug(res);
+          setScore([
+            [
+              res[0].classroom,
+              res[0].score_system_1,
+              String(res[0].score_system_2).replace("[", "").replace("]", ""),
+              res[0].score_system_3,
+            ],
+          ]);
+        }
+      );
+    }, 100);
+  }, []);
+
   const renderHeader = () => (
     <View style={styles.header}>
       <TouchableOpacity style={styles.option}>
@@ -51,7 +83,7 @@ const App = () => {
       </TouchableOpacity>
       <Picker
         selectedValue={selectedSemester}
-        onValueChange={(itemValue) => setSelectedSemester(itemValue)}
+        onValueChange={(itemValue) => otsetSelectedSemester(itemValue)}
         style={styles.picker}
       >
         <Picker.Item label="Học kì 1" value="Học kì 1" />
@@ -102,16 +134,17 @@ const App = () => {
   return (
     <View style={styles.container}>
       <View style={{ width: 200, marginBottom: ScaleSize(20) }}>
-        <Text style={styles.optionText}>Học sinh: {studentName}</Text>
+        <Text style={styles.optionText}>Student: {studentName}</Text>
       </View>
-      <View style={styles.option}>
-        <Text style={styles.optionText}>
-          Giáo viên chủ nhiệm: {teacherName}
-        </Text>
+      <View style={{ width: 200, marginBottom: ScaleSize(20) }}>
+        <Text style={styles.optionText}>Year: 2023</Text>
+      </View>
+      <View style={{ width: 200, marginBottom: ScaleSize(20) }}>
+        <Text style={styles.optionText}>Semester: 1</Text>
       </View>
       <Table borderStyle={{ borderWidth: 2, borderColor: "#c8e1ff" }}>
         <Row data={tableHead} style={styles.head} textStyle={styles.text} />
-        <Rows data={tableData} textStyle={styles.text} />
+        <Rows data={score} textStyle={styles.text} />
       </Table>
     </View>
   );

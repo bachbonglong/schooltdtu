@@ -132,7 +132,7 @@ export default class DuDoanChonKhoi extends Component {
   );
 
   generateResponseFromGPT = async (userMessage) => {
-    const apiKey = "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";
+    const apiKey = "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";
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -165,7 +165,7 @@ export default class DuDoanChonKhoi extends Component {
       }
     );
     console.debug("=-=vào rồi nè");
-    const apiKey = "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";
+    const apiKey = "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";
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {

@@ -15,6 +15,7 @@ import theme from "../theme";
 import { ScaleSize, getStorage, setStorage } from "../Utils.js";
 import { CallAPIAuthentication, CallNewAPI } from "../Utils/requestAPI";
 import { Popup, Root } from "popup-ui";
+import Spinner from "react-native-loading-spinner-overlay";
 
 const { width } = Dimensions.get("window");
 
@@ -26,6 +27,7 @@ class ChangePass extends React.Component {
       password: props?.route?.params?.password,
       new_password: "",
       username: props?.route?.params?.username,
+      spinner: false,
     };
   }
 
@@ -54,12 +56,14 @@ class ChangePass extends React.Component {
         buttonText: "Ok",
       });
     } else {
+      this.setState({ spinner: true });
       CallNewAPI(
         access_token,
         `users/accounts/change-password/${username}/`,
         { old_password: password, new_password: new_password },
         "PUT",
         (res) => {
+          this.setState({ spinner: false });
           if (res.message !== "Password changed successfully.") {
             Popup.show({
               type: "Danger",
@@ -85,6 +89,11 @@ class ChangePass extends React.Component {
     const { new_password, password } = this.state;
     return (
       <Block safe flex style={{ backgroundColor: theme.COLORS.WHITE }}>
+        <Spinner
+          visible={this.state.spinner}
+          size={"large"}
+          textStyle={styles.spinnerTextStyle}
+        />
         <NavBar
           style={
             Platform.OS === "android" ? { marginTop: theme.SIZES.BASE } : null

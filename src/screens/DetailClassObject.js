@@ -30,9 +30,24 @@ const ClassObjectDetail = (props) => {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [dataTemp, setDataTemp] = useState(0);
+  const [student, setStudent] = useState([]);
 
   useEffect(() => {
-    setListData(item?.posts);
+    console.debug("=-=item", item?.class_id);
+    setTimeout(async () => {
+      const access_token = await getStorage("access_token", "");
+      setListData(item?.posts);
+      CallNewAPI(
+        access_token,
+        `classroom/${item?.class_id}/students/`,
+        "",
+        "GET",
+        (res) => {
+          console.debug("=-=res", res);
+          setStudent(res);
+        }
+      );
+    }, 500);
   }, []);
 
   function getRandomItemsFromArray(array, count) {
@@ -184,7 +199,6 @@ const ClassObjectDetail = (props) => {
       const postIndexToEdit = listData.findIndex(
         (post) => post.post_id === dataTemp
       );
-      console.debug("=-=postIndexToEdit", postIndexToEdit);
       const updatedPosts = [...listData];
       updatedPosts[postIndexToEdit].title = title;
       updatedPosts[postIndexToEdit].content = body;
@@ -260,6 +274,31 @@ const ClassObjectDetail = (props) => {
         <Text>{`School Year: ${item?.school_year}`}</Text>
         <Text>{`Semester: ${item?.semester}`}</Text>
       </View>
+      <TouchableOpacity
+        style={[
+          styles.createButton,
+          {
+            height: 50,
+            marginBottom: 14,
+            backgroundColor: student.length > 0 ? "#007BFF" : "grey",
+          },
+        ]}
+        onPress={() =>
+          navigation?.navigate("List Student", {
+            data: student,
+            class: item?.class_id,
+          })
+        }
+      >
+        <Text
+          style={[
+            styles.createButtonText,
+            { textAlign: "center", fontSize: 20 },
+          ]}
+        >
+          LIST STUDENT
+        </Text>
+      </TouchableOpacity>
       <View style={styles.createPost}>
         <TextInput
           placeholder="Title"

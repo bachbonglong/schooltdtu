@@ -41,6 +41,10 @@ export async function CallAPIInfo(data, callback) {
 }
 
 export async function CallNewAPI(token, url, data, method, callback) {
+  console.debug("=-=token", token);
+  console.debug("=-=data", data);
+  console.debug("=-=url", url);
+  console.debug("=-=data", JSON.stringify(data));
   if (data) {
     try {
       const response = await fetch(`http://${domain}:8000/${url}`, {

@@ -31,6 +31,7 @@ const ProfileScreen = (props) => {
       const username = await getStorage("username", "");
       setUsername(username);
       let user = "";
+
       if (username.includes("gv")) {
         user = "teachers";
       } else {
@@ -43,7 +44,6 @@ const ProfileScreen = (props) => {
         "",
         "GET",
         (res) => {
-          console.debug("=-=res", res);
           setSpinner(false);
           if (res) setUserInfo(res);
         }

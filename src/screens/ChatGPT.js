@@ -79,7 +79,7 @@ const ChatScreen = () => {
   };
 
   const generateResponseFromGPT = async (userMessage) => {
-    const apiKey = "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";
+    const apiKey = "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";
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -93,7 +93,8 @@ const ChatScreen = () => {
     });
     const responseBody = await response.json();
     console.debug("=-=responseBody", responseBody);
-    return responseBody.choices[0].message.content;
+
+    return responseBody?.choices[0]?.message?.content;
   };
 
   return (

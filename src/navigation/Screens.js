@@ -39,6 +39,7 @@ import SpellScreen from "../screens/Spell";
 import DuDoanChonKhoi from "../screens/DuDoanChonKhoi";
 import QuickCaculator from "../screens/QuickCaculator";
 import GetInfo from "../screens/GetInfo";
+import Student from "../screens/Student";
 
 const { width } = Dimensions.get("screen");
 
@@ -384,6 +385,8 @@ function HomeStack(props) {
         component={GetInfo}
         options={{}}
       />
+
+      <Stack.Screen name="List Student" component={Student} options={{}} />
     </Stack.Navigator>
   );
 }

@@ -68,6 +68,7 @@ class Login extends React.Component {
           setStorage("access_token", res?.access_token);
         } else if (res?.message == "Please change your password") {
           setStorage("username", username);
+          setStorage("access_token", res?.access_token);
           navigation.navigate("CHANGE PASS", {
             access_token: res?.access_token,
             password: password,

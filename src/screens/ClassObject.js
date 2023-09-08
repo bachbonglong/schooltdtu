@@ -10,41 +10,19 @@ import {
 import { CallNewAPI } from "../Utils/requestAPI";
 import { ScaleSize, getStorage } from "../Utils";
 import moment from "moment";
-
-const subjectsData = [
-  {
-    id: "1",
-    name: "Toán",
-    teacher: "Nguyễn Văn A",
-    teacherImage:
-      "https://media.baamboozle.com/uploads/images/477884/1632789227_114328.png",
-  },
-  {
-    id: "2",
-    name: "Lý",
-    teacher: "Phạm Thị B",
-    teacherImage:
-      "https://media.baamboozle.com/uploads/images/477884/1632789227_114328.png",
-  },
-  {
-    id: "3",
-    name: "Hóa",
-    teacher: "Trần Văn C",
-    teacherImage:
-      "https://media.baamboozle.com/uploads/images/477884/1632789227_114328.png",
-  },
-  // Add more subjects here
-];
+import Spinner from "react-native-loading-spinner-overlay";
 
 const ClassObject = (props) => {
   const [classData, setClassData] = useState([]);
+  const [spinner, setSpinner] = useState(false);
 
   useEffect(() => {
     setTimeout(async () => {
       const access_token = await getStorage("access_token", "");
-
+      setSpinner(true);
       CallNewAPI(access_token, `users/list-classrooms/`, "", "GET", (res) => {
         // if (res) setUserInfo(res);
+        setSpinner(false);
         setClassData(res);
       });
     }, 100);
@@ -96,7 +74,7 @@ const ClassObject = (props) => {
       <Image
         source={{
           uri: "https://w7.pngwing.com/pngs/955/437/png-transparent-arrow-chevron-right-small-direction-navigation-arrow-icon.png",
-        }} // Thay đổi đường dẫn ảnh của mũi tên bên phải
+        }}
         style={styles.arrowIcon}
       />
     </TouchableOpacity>
@@ -108,6 +86,7 @@ const ClassObject = (props) => {
 
   return (
     <View style={styles.container}>
+      <Spinner visible={spinner} size={"large"} />
       <FlatList
         data={classData}
         renderItem={renderSubjectItem}
